@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Typeflow — a modern typing speed test. Measure your WPM, CPM and accuracy." />
+  <title>TypeFlow | Created by Ravi Singh Thakur</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <link rel="stylesheet" href="style.css?v=3" />
+</head>
+<body>
+  <!-- Ambient gradient glow layer, purely decorative -->
+  <div class="bg-glow" aria-hidden="true"></div>
+
+  <div class="app">
+
+    <!-- ============================== HEADER ============================== -->
+    <header class="app-header">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">⌨</span>
+        <div class="brand-text">
+          <h1>TypeFlow</h1>
+          <p>Created by Ravi Singh Thakur</p>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <label class="name-field">
+          <span>Name</span>
+          <input type="text" id="player-name" maxlength="16" placeholder="Guest" autocomplete="off" />
+        </label>
+        <button id="sound-toggle" class="btn-ghost" type="button" title="Toggle sound effects">🔊 Sound: On</button>
+        <button id="theme-toggle" class="icon-btn" type="button" title="Toggle dark mode (Ctrl+D)" aria-label="Toggle dark mode">🌙</button>
+      </div>
+    </header>
+
+    <!-- ============================== CONTROLS ============================== -->
+    <section class="controls glass" aria-label="Test settings">
+      <div class="control-group" role="group" aria-label="Difficulty">
+        <span class="control-label">Difficulty</span>
+        <div class="segmented" id="difficulty-segmented">
+          <button class="segment" type="button" data-difficulty="easy">Easy</button>
+          <button class="segment active" type="button" data-difficulty="medium">Medium</button>
+          <button class="segment" type="button" data-difficulty="hard">Hard</button>
+          <button class="segment" type="button" data-difficulty="custom">Custom</button>
+        </div>
+      </div>
+
+      <div class="control-group" role="group" aria-label="Duration">
+        <span class="control-label">Time</span>
+        <div class="segmented" id="time-segmented">
+          <button class="segment" type="button" data-time="15">15s</button>
+          <button class="segment active" type="button" data-time="30">30s</button>
+          <button class="segment" type="button" data-time="60">60s</button>
+          <button class="segment" type="button" data-time="120">120s</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================== TEST CARD ============================== -->
+    <section class="test-card glass" id="test-card" aria-label="Typing test">
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+
+      <div class="text-display-wrap" id="text-display-wrap">
+        <div class="text-display" id="text-display"><!-- character spans injected by JS --></div>
+        <div class="focus-hint" id="focus-hint">Click here and start typing to begin</div>
+        <textarea
+          id="typing-input"
+          class="sr-input"
+          autocomplete="off"
+          autocorrect="off"
+          autocapitalize="off"
+          spellcheck="false"
+          aria-label="Type the text shown above"
+        ></textarea>
+      </div>
+    </section>
+
+    <!-- ============================== LIVE STATS ============================== -->
+    <section class="stats-grid" aria-label="Live statistics">
+      <div class="stat-card glass">
+        <span class="stat-value" id="stat-wpm">0</span>
+        <span class="stat-label">WPM</span>
+      </div>
+      <div class="stat-card glass">
+        <span class="stat-value" id="stat-accuracy">100<small>%</small></span>
+        <span class="stat-label">Accuracy</span>
+      </div>
+      <div class="stat-card glass">
+        <span class="stat-value" id="stat-errors">0</span>
+        <span class="stat-label">Errors</span>
+      </div>
+      <div class="stat-card glass" id="time-card">
+        <span class="stat-value" id="stat-time">30<small>s</small></span>
+        <span class="stat-label">Time Left</span>
+      </div>
+      <div class="stat-card glass">
+        <span class="stat-value" id="stat-chars">0</span>
+        <span class="stat-label">Characters</span>
+      </div>
+    </section>
+
+    <!-- ============================== ACTIONS ============================== -->
+    <section class="actions">
+      <button id="restart-btn" class="btn-primary" type="button">
+        ↻ Restart <kbd>Ctrl</kbd>+<kbd>R</kbd>
+      </button>
+    </section>
+
+    <!-- ============================== RESULTS OVERLAY ============================== -->
+    <div class="overlay" id="results-overlay" hidden>
+      <div class="overlay-card glass">
+        <h2>Test Complete</h2>
+        <div class="results-badge" id="results-badge" hidden>
+          <span class="results-badge-icon" id="results-badge-icon"></span>
+          <span class="results-badge-name" id="results-badge-name"></span>
+        </div>
+
+        <div class="results-grid">
+          <div class="results-item"><span id="result-wpm">0</span><label>WPM</label></div>
+          <div class="results-item"><span id="result-cpm">0</span><label>CPM</label></div>
+          <div class="results-item"><span id="result-accuracy">0%</span><label>Accuracy</label></div>
+          <div class="results-item"><span id="result-errors">0</span><label>Errors</label></div>
+        </div>
+
+        <p class="results-best" id="results-best" hidden>🏆 New personal best!</p>
+
+        <div class="overlay-actions">
+          <button id="results-restart" class="btn-primary" type="button">Try Again</button>
+          <button id="results-close" class="btn-secondary" type="button">View Dashboard</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================== DASHBOARD ============================== -->
+    <section class="dashboard-grid">
+
+      <div class="panel glass">
+        <h3>Achievements</h3>
+        <div class="badges" id="badges-row">
+          <div class="badge" data-badge="beginner">
+            <span class="badge-icon">🥉</span>
+            <span class="badge-name">Beginner</span>
+            <span class="badge-req">20 WPM</span>
+          </div>
+          <div class="badge" data-badge="intermediate">
+            <span class="badge-icon">🥈</span>
+            <span class="badge-name">Intermediate</span>
+            <span class="badge-req">40 WPM</span>
+          </div>
+          <div class="badge" data-badge="advanced">
+            <span class="badge-icon">🥇</span>
+            <span class="badge-name">Advanced</span>
+            <span class="badge-req">60 WPM</span>
+          </div>
+          <div class="badge" data-badge="expert">
+            <span class="badge-icon">💎</span>
+            <span class="badge-name">Expert</span>
+            <span class="badge-req">80 WPM</span>
+          </div>
+        </div>
+        <p class="best-wpm">Personal best: <strong id="best-wpm-display">0</strong> WPM</p>
+      </div>
+
+      <div class="panel glass">
+        <h3>Mistyped Keys</h3>
+        <div class="keyboard-heatmap" id="keyboard-heatmap"><!-- keys injected by JS --></div>
+      </div>
+
+      <div class="panel glass">
+        <h3>Leaderboard</h3>
+        <ol class="leaderboard" id="leaderboard-list"></ol>
+      </div>
+
+      <div class="panel glass">
+        <h3>Typing History</h3>
+        <canvas id="history-chart"></canvas>
+      </div>
+
+    </section>
+
+    <!-- ============================== CUSTOM TEXT MODAL ============================== -->
+    <div class="overlay" id="custom-modal" hidden>
+      <div class="overlay-card glass">
+        <h2>Use Your Own Text</h2>
+        <p class="modal-hint">Paste or write a passage (at least 10 characters) to practice on.</p>
+        <textarea id="custom-text-input" class="custom-textarea" placeholder="Paste your custom paragraph here..."></textarea>
+        <div class="overlay-actions">
+          <button id="custom-cancel" class="btn-secondary" type="button">Cancel</button>
+          <button id="custom-apply" class="btn-primary" type="button">Use This Text</button>
+        </div>
+      </div>
+    </div>
+
+    <footer class="app-footer">
+      <p>Shortcuts: <kbd>Ctrl</kbd>+<kbd>R</kbd> restart test &nbsp;·&nbsp; <kbd>Ctrl</kbd>+<kbd>D</kbd> toggle dark mode</p>
+      <p style="margin-top:10px;font-size:0.95rem;opacity:0.9;">© 2026 TypeFlow. Created and developed by <strong>Ravi Singh Thakur</strong>. All Rights Reserved.</p>
+    </footer>
+
+  </div>
+
+  <script src="script.js?v=3"></script>
+</body>
+</html>
